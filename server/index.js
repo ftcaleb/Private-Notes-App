@@ -12,28 +12,17 @@ app.use(cors());
 app.post("/register", async (req, res) => {
   const { email, password, name } = req.body;
 
-  try {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { name }, // stored as user_metadata
-      },
-    });
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { name } },
+  });
 
-    if (error) {
-      return res.status(400).json({ error: error.message });
-    }
-
-    // ✅ CORRECT ACCESS
-    return res.status(201).json({
-      message: "User registered successfully",
-      user: data.user,
-    });
-  } catch (err) {
-    console.error("REGISTER ERROR:", err);
-    return res.status(500).json({ error: "Internal server error" });
+  if (error) {
+    return res.status(400).json({ error: error.message });
   }
+
+  res.status(201).json({ message: "User registered", user: data.user });
 });
 
 /**
@@ -42,27 +31,131 @@ app.post("/register", async (req, res) => {
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+  const { data, error } =
+    await supabase.auth.signInWithPassword({ email, password });
 
-    if (error || !data?.user) {
-      return res.status(401).json({ error: "Invalid email or password" });
-    }
-
-    // ✅ CORRECT ACCESS
-    return res.status(200).json({
-      message: "Successfully Logged In",
-      user: data.user,
-      session: data.session,
-    });
-  } catch (err) {
-    console.error("LOGIN ERROR:", err);
-    return res.status(500).json({ error: "Internal server error" });
+  if (error) {
+    return res.status(401).json({ error: error.message });
   }
+
+  res.json({
+    message: "Successfully Logged In",
+    user: data.user,
+    token: data.session.access_token,
+  });
 });
+
+/**
+ * AUTH MIDDLEWARE (Supabase)
+ */
+const authMiddleware = async (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) return res.status(401).json({ error: "No token" });
+
+  const { data, error } = await supabase.auth.getUser(token);
+
+  if (error) return res.status(401).json({ error: "Invalid token" });
+
+  req.user = data.user;
+  next();
+};
+
+/**
+ * CREATE NOTE
+ */
+app.post("/notes", authMiddleware, async (req, res) => {
+  const { title, description } = req.body;
+
+  const { error } = await supabase.from("notes").insert({
+    title,
+    description,
+    user_id: req.user.id,
+  });
+
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+
+  res.json({ success: true });
+});
+
+/**
+ * GET NOTES
+ */
+app.get("/notes", authMiddleware, async (req, res) => {
+  const { data, error } = await supabase
+    .from("notes")
+    .select("*")
+    .eq("user_id", req.user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+
+  res.json({ notes: data });
+});
+
+// Edit Notes
+/**
+ * UPDATE NOTE
+ */
+/**
+ * UPDATE NOTE (Supabase)
+ */
+app.put("/notes/:id", authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  const { title, description } = req.body;
+
+  const { data, error } = await supabase
+    .from("notes")
+    .update({ title, description })
+    .eq("id", id)
+    .eq("user_id", req.user.id) // security
+    .select()
+    .single();
+
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+
+  res.json({
+    success: true,
+    note: data,
+  });
+});
+
+
+
+
+// Delete Note
+/**
+ * DELETE NOTE (Supabase)
+ */
+/**
+ * DELETE NOTE (Supabase)
+ */
+app.delete("/notes/:id", authMiddleware, async (req, res) => {
+  const { id } = req.params;
+
+  const { error } = await supabase
+    .from("notes")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", req.user.id); // security: only delete own notes
+
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+
+  res.json({
+    success: true,
+    message: "Note deleted successfully",
+  });
+});
+
+
 
 app.listen(3002, () => {
   console.log("Server running on port 3002");
