@@ -23,7 +23,7 @@ export default function Sidebar() {
 
   // Temporary notes data
   const notes = [
-    { id: 1, title: "School" },
+    { id: 1, title: "ToDo List" },
     { id: 2, title: "ToDo List" },
     { id: 3, title: "Project Ideas" },
   ];
@@ -53,6 +53,7 @@ export default function Sidebar() {
             <SidebarItem
               icon={<FolderPlus size={20} />}
               text="Add Note / File"
+              
             />
 
             {/* Notes list */}
