@@ -3,6 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Signup() {
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
+
+
+
+
   const [name, setName] = useState();
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
@@ -11,7 +16,7 @@ function Signup() {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .post("http://localhost:3002/register", { name, email, password })
+      .post(`${API_URL}/register`, { name, email, password })
       .then((res) => {
         console.log(res);
         navigate("/login");

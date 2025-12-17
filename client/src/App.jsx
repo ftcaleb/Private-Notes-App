@@ -11,6 +11,9 @@ import axios from 'axios';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
+  console.log("API_URL:", API_URL); // 👈 PUT IT HERE
+
   const [isModalOpen, setModalOpen] = useState(false);
   const [notes, setNotes] = useState([]);
   const [currentNote, setCurrentNote] = useState(null)
@@ -25,7 +28,7 @@ function App() {
   const editNote = async (id, title, description) => {
   try {
     await axios.put(
-      `http://localhost:3002/notes/${id}`,
+       `${API_URL}/notes/${id}`,
       { title, description },
       {
         headers: {
@@ -45,7 +48,7 @@ function App() {
   const deleteNote = async (id) => {
   try {
     await axios.delete(
-      `http://localhost:3002/notes/${id}`,
+      `${API_URL}/notes/${id}`,
       
       {
         headers: {
@@ -71,7 +74,7 @@ function App() {
 
   const fetchNotes = async () => {
     try {
-      const { data } = await axios.get("http://localhost:3002/notes", {
+      const { data } = await axios.get(`${API_URL}/notes`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -85,7 +88,7 @@ function App() {
   const addNote = async (title, description) => {
     try {
       await axios.post(
-        "http://localhost:3002/notes",
+        `${API_URL}/notes`,
         { title, description },
         {
           headers: {
