@@ -12,7 +12,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
   const API_URL = import.meta.env.VITE_BACKEND_URL;
-  console.log("API_URL:", API_URL); // 👈 PUT IT HERE
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [notes, setNotes] = useState([]);
