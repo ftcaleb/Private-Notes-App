@@ -23,7 +23,7 @@ export default function Sidebar() {
 
   // Temporary notes data
   const notes = [
-    { id: 1, title: "ToDo List" },
+    { id: 1, title: "School" },
     { id: 2, title: "ToDo List" },
     { id: 3, title: "Project Ideas" },
   ];
