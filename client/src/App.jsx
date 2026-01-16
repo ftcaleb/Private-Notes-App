@@ -13,6 +13,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 function App() {
   const API_URL = import.meta.env.VITE_BACKEND_URL;
 
+  
   const [isModalOpen, setModalOpen] = useState(false);
   const [notes, setNotes] = useState([]);
   const [currentNote, setCurrentNote] = useState(null)
