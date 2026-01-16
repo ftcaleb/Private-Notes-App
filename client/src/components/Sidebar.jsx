@@ -1,9 +1,10 @@
 // Importing icons
-import {ChevronFirst, ChevronLast, MoreVertical, UserCircle, FileText, FolderPlus,} from "lucide-react";
+import {ChevronFirst, ChevronLast, MoreVertical, UserCircle, FileText, FolderPlus, LogOut } from "lucide-react";
 import {FiLogOut} from "react-icons/fi";
 // React hooks and context for state management
 import { createContext, useContext, useState } from "react";
 import { useAuth } from "../context/ContextProvider";
+import { Link } from "react-router-dom";
 
 const SidebarContext = createContext();
 
@@ -28,6 +29,8 @@ export default function Sidebar() {
     { id: 3, title: "Project Ideas" },
   ];
 
+  // Handles the logout process
+  
   return (
     <aside>
       {/* 
@@ -112,6 +115,9 @@ export default function Sidebar() {
 )}
 
           </button>
+          
+          
+
 
           {/* Profile dropdown */}
           {profileOpen && (
@@ -120,10 +126,22 @@ export default function Sidebar() {
               <p className="text-gray-500 text-xs mb-2">{user?.email || "Guest"}</p>
 
               {/* Option to add another account */}
-              <button className="w-full text-left px-2 py-1 rounded hover:bg-gray-100">
-                Add account
-              </button>
+              <div className=" gap-2 text-red-500 hover:bg-gray-100 w-full px-2 py-1 rounded">
+               <Link
+            to="/register"
+            
+          >
+            <div className="flex flex-row items-center gap-1">
+              <div><LogOut size={16} /></div>
+            <div >Logout</div>
             </div>
+            
+            
+                
+              </Link>
+              </div>
+            </div>
+           
           )}
         </div>
       </nav>
