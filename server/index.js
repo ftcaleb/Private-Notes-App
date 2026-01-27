@@ -6,6 +6,12 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// 📝 Log all requests
+app.use((req, res, next) => {
+  console.error(`📨 ${req.method} ${req.path}`);
+  next();
+});
+
 /**
  * REGISTER
  */
@@ -49,16 +55,30 @@ app.post("/login", async (req, res) => {
  * AUTH MIDDLEWARE (Supabase)
  */
 const authMiddleware = async (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
 
-  if (!token) return res.status(401).json({ error: "No token" });
+    if (!token) {
+      console.log("❌ No token provided");
+      return res.status(401).json({ error: "No token" });
+    }
 
-  const { data, error } = await supabase.auth.getUser(token);
+    console.log("🔑 Token received:", token.substring(0, 20) + "...");
 
-  if (error) return res.status(401).json({ error: "Invalid token" });
+    const { data, error } = await supabase.auth.getUser(token);
 
-  req.user = data.user;
-  next();
+    if (error) {
+      console.log("❌ Token validation error:", error);
+      return res.status(401).json({ error: "Invalid token", details: error.message });
+    }
+
+    console.log("✅ User authenticated:", data.user.email);
+    req.user = data.user;
+    next();
+  } catch (err) {
+    console.log("❌ Auth middleware error:", err);
+    res.status(401).json({ error: "Auth error", details: err.message });
+  }
 };
 
 /**

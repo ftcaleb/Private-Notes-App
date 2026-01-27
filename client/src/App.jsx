@@ -121,7 +121,7 @@ function App() {
               <div className="bg-black w-full relative">
 
                 <div className="px-8 pt-4 grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {notes.map((note) => (
+                  {notes && notes.map((note) => (
                     <NoteCard key={note.id} note={note} onEdit={onEdit} deleteNote={deleteNote} />
                   ))}
                 </div>
