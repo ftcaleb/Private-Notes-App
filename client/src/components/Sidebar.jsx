@@ -17,17 +17,12 @@ export default function Sidebar() {
   const [expanded, setExpanded] = useState(true);
 
  //Tracks which note is open, and only one note can be open at a time
-  const [openNoteMenu, setOpenNoteMenu] = useState(null);
 
   // Controls whether the user profile dropdown is open
   const [profileOpen, setProfileOpen] = useState(false);
 
   // Temporary notes data
-  const notes = [
-    { id: 1, title: "School" },
-    { id: 2, title: "ToDo List" },
-    { id: 3, title: "Project Ideas" },
-  ];
+  
 
   // Handles the logout process
   
@@ -37,10 +32,13 @@ export default function Sidebar() {
         Main sidebar container
         - Border on the right to separate it from main content
       */}
-      <nav className="h-full min-h-full flex flex-col bg-[#F4F5FA] border-r shadow-sm">
+      <SidebarContext.Provider value={{ expanded }}>
+        <nav className={`h-full min-h-full flex flex-col bg-[#F4F5FA] border-r shadow-sm transition-all duration-300 ${
+          expanded ? "w-64" : "w-20"
+        }`}>
         {/* Top Section */}
         {/* Contains the collapse / expand button */}
-        <div className="p-4 pb-2 flex justify-between items-center">
+        <div className="p-7 pb-2 flex justify-between items-center">
           <button
             // Toggles sidebar between expanded and collapsed states
             onClick={() => setExpanded((curr) => !curr)}
@@ -51,54 +49,9 @@ export default function Sidebar() {
         </div>
 
         {/* Sidebar navigation items */}
-        <SidebarContext.Provider value={{ expanded }}>
-          <ul className="flex-1 px-3">
-            <SidebarItem
-              icon={<FolderPlus size={20} />}
-              text="Add Note / File"
-              
-            />
-
-            {/* Notes list */}
-            {/* Each note behaves like a file with a 3-dot menu */}
-            {notes.map((note) => (
-              <li
-                key={note.id}
-                className="relative flex items-center justify-between py-2 px-3 my-1 rounded-md cursor-pointer hover:bg-indigo-50 text-gray-600"
-              >
-                {/* Note icon and title */}
-                <div className="flex items-center gap-3">
-                  <FileText size={18} />
-
-                  {/* Note title only shows when sidebar is expanded/opened */}
-                  {expanded && <span>{note.title}</span>}
-                </div>
-
-                {/* Three-dot menu button */}
-                <button
-                  // Toggles the menu for the selected note
-                  onClick={() =>
-                    setOpenNoteMenu(openNoteMenu === note.id ? null : note.id)
-                  }
-                >
-                  <MoreVertical size={16} />
-                </button>
-
-                {/* Dropdown menu for each note */}
-                {openNoteMenu === note.id && (
-                  <div className="absolute right-2 top-10 w-28 bg-white  rounded-md shadow-md text-sm z-5">
-                    <MenuItem text="View" />
-                    <MenuItem text="Edit" />
-                    <MenuItem text="Delete" danger />
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        </SidebarContext.Provider>
-
+       
         {/* User profile section at the bottom */}
-        <div className="relative  p-3">
+        <div className="relative flex p-3 mt-auto">
           <button
             // Toggles the profile dropdown
             onClick={() => setProfileOpen(!profileOpen)}
@@ -108,43 +61,32 @@ export default function Sidebar() {
 
             {/* Profile text only visible when expanded */}
             {expanded && (
-  <span className="text-sm font-medium">
-    {user?.user_metadata?.name || "Guest"}
-
-  </span>
-)}
-
+              <span className="text-sm font-medium">
+                {user?.user_metadata?.name || "Guest"}
+              </span>
+            )}
           </button>
-          
-          
-
 
           {/* Profile dropdown */}
           {profileOpen && (
-            <div className="absolute bottom-14 left-3 right-3 bg-white rounded-md shadow-md p-3 text-sm">
+            <div className="absolute bottom-14 left-3 right-3 m-auto bg-white rounded-md shadow-md p-3 text-sm">
               <p className="font-medium">{user?.user_metadata?.name || "Guest"}</p>
               <p className="text-gray-500 text-xs mb-2">{user?.email || "Guest"}</p>
 
               {/* Option to add another account */}
-              <div className=" gap-2 text-red-500 hover:bg-gray-100 w-full px-2 py-1 rounded">
-               <Link
-            to="/register"
-            
-          >
-            <div className="flex flex-row items-center gap-1">
-              <div><LogOut size={16} /></div>
-            <div >Logout</div>
-            </div>
-            
-            
-                
-              </Link>
+              <div className="m-auto gap-2 text-red-500 hover:bg-gray-100 w-full px-2 py-1 rounded">
+                <Link to="/register">
+                  <div className="flex flex-row items-center  gap-1">
+                    <div><LogOut size={16} /></div>
+                    <div>Logout</div>
+                  </div>
+                </Link>
               </div>
             </div>
-           
           )}
         </div>
-      </nav>
+        </nav>
+      </SidebarContext.Provider>
     </aside>
   );
 }

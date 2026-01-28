@@ -1,7 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Signup from './Signup';
 import Login from './Login';
-import Notepad from './components/NotePad';
 import Sidebar from './components/Sidebar';
 import React, { useState, useEffect } from "react";
 import NoteCard from './components/NoteCard';
@@ -13,6 +12,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 function App() {
   const API_URL = import.meta.env.VITE_BACKEND_URL;
 
+  const [searchTerm, setSearchTerm] = useState("");
   
   const [isModalOpen, setModalOpen] = useState(false);
   const [notes, setNotes] = useState([]);
@@ -118,12 +118,34 @@ function App() {
             <div className="flex h-screen">
               <Sidebar  />
 
-              <div className="bg-black w-full relative">
+              <div className="bg-black w-full justify-center align-center">
+                <div className='flex justify-center mt-3'>
+                  <input
+                    type="text"
+                    placeholder="Search notes..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full max-w-xl ml-3 rounded-md border px-4 py-2 text-sm text-white"
+                  />
+              </div>
+                
 
                 <div className="px-8 pt-4 grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {notes && notes.map((note) => (
-                    <NoteCard key={note.id} note={note} onEdit={onEdit} deleteNote={deleteNote} />
-                  ))}
+                  {notes
+                    .filter((note) =>
+                      note.title?.toLowerCase().includes(searchTerm.toLowerCase())
+                    )
+                    .map((note) => (
+                      <NoteCard
+                        key={note.id}
+                        note={note}
+                        onEdit={() => {
+                          setCurrentNote(note);
+                          onEdit(note);
+                        }}
+                        deleteNote={deleteNote}
+                      />
+                    ))}
                 </div>
 
                 <button
